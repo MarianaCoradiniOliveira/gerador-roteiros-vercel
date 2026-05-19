@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>gerador de roteiros · must media</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0D0D12;--s1:#13131A;--s2:#1C1C27;--s3:#232331;
+  --bd:#2A2A3D;--or:#E8612D;--orl:#FF7A47;
+  --odim:rgba(232,97,45,0.12);--oglow:rgba(232,97,45,0.25);
+  --tx:#F0F0F8;--tm:#7A7A9A;--td:#4A4A6A;--gn:#2ECC71;
+  --r:14px;--rs:8px;--t:.18s ease;
+}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--tx);font-family:'Space Grotesk',sans-serif;font-size:13px;line-height:1.6;overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");pointer-events:none;z-index:0;opacity:.5}
+.orb{position:fixed;border-radius:50%;filter:blur(80px);pointer-events:none;z-index:0;opacity:.06}
+.o1{width:400px;height:400px;background:var(--or);top:-100px;right:-100px}
+.o2{width:300px;height:300px;background:#8B5CF6;bottom:20%;left:-80px}
+
+header{padding:16px 24px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--bd);position:sticky;top:0;background:rgba(13,13,18,.92);backdrop-filter:blur(20px);z-index:100}
+.logo{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600;color:var(--tm)}
+.logo span{color:var(--or)}
+.badge{background:var(--odim);border:1px solid var(--oglow);color:var(--or);font-size:10px;font-weight:700;padding:3px 10px;border-radius:20px;letter-spacing:.5px;text-transform:uppercase}
+
+.container{max-width:860px;margin:0 auto;padding:40px 20px 70px;position:relative;z-index:1}
+
+.hero{text-align:center;margin-bottom:40px}
+.eyebrow{display:inline-flex;align-items:center;gap:5px;font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--or);padding:4px 12px;background:var(--odim);border-radius:20px;border:1px solid var(--oglow);margin-bottom:14px}
+.eyebrow::before{content:'';width:5px;height:5px;background:var(--or);border-radius:50%;animation:blink 2s ease infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+.hero h1{font-size:clamp(24px,4vw,40px);font-weight:700;letter-spacing:-1.5px;line-height:1.1;margin-bottom:10px}
+.hero h1 em{font-style:normal;color:var(--or)}
+.hero p{font-size:14px;color:var(--tm);max-width:480px;margin:0 auto}
+
+.card{background:var(--s1);border:1px solid var(--bd);border-radius:20px;overflow:hidden}
+.sec{padding:24px;border-bottom:1px solid var(--bd)}
+.sec:last-child{border-bottom:none}
+.slabel{display:flex;align-items:center;gap:8px;font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--td);margin-bottom:16px}
+.slabel::after{content:'';flex:1;height:1px;background:var(--bd)}
+.br{color:var(--or);font-size:8px;background:var(--odim);padding:2px 5px;border-radius:3px;border:1px solid var(--oglow)}
+.bo{color:var(--td);font-size:8px;background:var(--s3);padding:2px 5px;border-radius:3px;border:1px solid var(--bd)}
+
+.grid{display:grid;gap:14px}
+.g2{grid-template-columns:1fr 1fr}
+.g3{grid-template-columns:1fr 1fr 1fr}
+@media(max-width:580px){.g2,.g3{grid-template-columns:1fr}.sec{padding:18px 16px}}
+.field{display:flex;flex-direction:column;gap:6px}
+label{font-size:11px;font-weight:600;color:var(--tm);display:flex;align-items:center;gap:4px}
+label .req{color:var(--or)}
+label .hint{font-size:9px;font-weight:400;color:var(--td);margin-left:auto}
+
+input[type=text],textarea,select{background:var(--s2);border:1px solid var(--bd);border-radius:var(--rs);color:var(--tx);font-family:'Space Grotesk',sans-serif;font-size:13px;padding:10px 12px;transition:var(--t);outline:none;width:100%;-webkit-appearance:none;appearance:none}
+input::placeholder,textarea::placeholder{color:var(--td)}
+input:focus,textarea:focus,select:focus{border-color:var(--or);background:var(--s3);box-shadow:0 0 0 3px var(--odim)}
+textarea{resize:vertical;min-height:90px;line-height:1.6}
+textarea.big{min-height:120px}
+select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%237A7A9A' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;padding-right:30px;cursor:pointer}
+select option{background:#1C1C27}
+
+.kp{position:relative}
+.kpc{position:absolute;bottom:9px;right:11px;font-size:10px;color:var(--td);font-family:'DM Mono',monospace;pointer-events:none}
+
+.tipo-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.tc{position:relative;cursor:pointer;border-radius:var(--rs);border:1px solid var(--bd);background:var(--s2);padding:14px;transition:var(--t);display:flex;flex-direction:column;gap:3px;user-select:none}
+.tc:hover{border-color:var(--oglow);background:var(--s3)}
+.tc.sel{border-color:var(--or);background:var(--odim);box-shadow:0 0 0 3px var(--odim)}
+.tc input[type=radio]{position:absolute;opacity:0;width:0;height:0}
+.te{font-size:18px;margin-bottom:2px}
+.tn{font-size:12px;font-weight:700;color:var(--tx)}
+.tc.sel .tn{color:var(--or)}
+.tdesc{font-size:10px;color:var(--td);line-height:1.4}
+.tc.sel .tdesc{color:var(--tm)}
+.tck{position:absolute;top:10px;right:10px;width:14px;height:14px;border-radius:50%;border:1.5px solid var(--bd);background:var(--s1);display:flex;align-items:center;justify-content:center;transition:var(--t)}
+.tc.sel .tck{background:var(--or);border-color:var(--or)}
+.tck::after{content:'✓';font-size:8px;color:#fff;opacity:0;transition:var(--t)}
+.tc.sel .tck::after{opacity:1}
+
+.genwrap{padding:24px;background:linear-gradient(to bottom,var(--s1),var(--s2))}
+.btn-gen{width:100%;padding:16px 28px;background:var(--or);color:#fff;border:none;border-radius:var(--r);font-family:'Space Grotesk',sans-serif;font-size:15px;font-weight:700;cursor:pointer;transition:var(--t);display:flex;align-items:center;justify-content:center;gap:8px;position:relative;overflow:hidden}
+.btn-gen::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,.1) 0%,transparent 60%);pointer-events:none}
+.btn-gen:hover{background:var(--orl);transform:translateY(-1px);box-shadow:0 8px 30px var(--oglow)}
+.btn-gen:active{transform:none}
+.btn-gen:disabled{opacity:.55;cursor:not-allowed;transform:none}
+
+.loadwrap{display:none;flex-direction:column;align-items:center;gap:18px;padding:48px 24px;text-align:center}
+.loadwrap.on{display:flex}
+.spin{width:42px;height:42px;border:3px solid var(--bd);border-top-color:var(--or);border-radius:50%;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.ltxt{font-size:13px;color:var(--tm)}
+.lsteps{display:flex;flex-direction:column;gap:5px;width:100%;max-width:300px}
+.lstep{display:flex;align-items:center;gap:8px;font-size:11px;color:var(--td);padding:7px 12px;background:var(--s2);border-radius:var(--rs);border:1px solid var(--bd);transition:var(--t)}
+.lstep.on{color:var(--or);border-color:var(--oglow);background:var(--odim)}
+.lstep.done{color:var(--gn);border-color:rgba(46,204,113,.2)}
+
+.resultwrap{display:none;animation:fup .35s ease}
+.resultwrap.on{display:block}
+@keyframes fup{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+.rhead{display:flex;align-items:center;justify-content:space-between;padding:20px 24px;border-bottom:1px solid var(--bd);gap:10px;flex-wrap:wrap}
+.rtitle{font-size:13px;font-weight:700;color:var(--tm);display:flex;align-items:center;gap:6px}
+.rtitle::before{content:'';width:7px;height:7px;background:var(--gn);border-radius:50%}
+.racts{display:flex;gap:7px}
+.ba{padding:7px 14px;border-radius:var(--rs);font-family:'Space Grotesk',sans-serif;font-size:11px;font-weight:600;cursor:pointer;transition:var(--t);display:flex;align-items:center;gap:5px;border:1px solid var(--bd);background:var(--s2);color:var(--tm)}
+.ba:hover{border-color:var(--or);color:var(--or);background:var(--odim)}
+.ba.p{background:var(--or);color:#fff;border-color:transparent}
+.ba.p:hover{background:var(--orl);color:#fff}
+.ba.cp{background:rgba(46,204,113,.12);color:var(--gn);border-color:rgba(46,204,113,.28)}
+.rbody{padding:24px}
+.sout{font-family:'DM Mono',monospace;font-size:12px;line-height:1.85;color:var(--tx);white-space:pre-wrap;word-break:break-word;background:var(--s2);border:1px solid var(--bd);border-radius:var(--r);padding:24px;max-height:640px;overflow-y:auto}
+.sout::-webkit-scrollbar{width:5px}
+.sout::-webkit-scrollbar-track{background:var(--s1)}
+.sout::-webkit-scrollbar-thumb{background:var(--bd);border-radius:3px}
+.sout::-webkit-scrollbar-thumb:hover{background:var(--or)}
+.regenstrip{display:flex;gap:8px;margin-top:16px;flex-wrap:wrap}
+.bregen{flex:1;min-width:140px;padding:10px 16px;background:var(--s2);border:1px solid var(--bd);border-radius:var(--rs);color:var(--tm);font-family:'Space Grotesk',sans-serif;font-size:12px;font-weight:600;cursor:pointer;transition:var(--t);display:flex;align-items:center;justify-content:center;gap:5px}
+.bregen:hover{border-color:var(--or);color:var(--or);background:var(--odim)}
+.bregen:disabled{opacity:.45;cursor:not-allowed}
+.errbox{display:none;background:rgba(231,76,60,.1);border:1px solid rgba(231,76,60,.28);border-radius:var(--r);padding:14px 18px;color:#E74C3C;font-size:12px;line-height:1.6;margin-top:12px}
+.errbox.on{display:block}
+footer{text-align:center;padding:32px 24px;border-top:1px solid var(--bd);position:relative;z-index:1}
+footer p{font-size:11px;color:var(--td)}
+footer span{color:var(--or)}
+</style>
+</head>
+<body>
+<div class="orb o1"></div>
+<div class="orb o2"></div>
+
+<header>
+  <div class="logo">
+    <svg width="28" height="28" viewBox="0 0 120 120" fill="none">
+      <path d="M15 85 L35 45 L55 70 L75 30 L95 85" stroke="#E8612D" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+      <path d="M80 30 L95 15 L95 45 Z" fill="#FF7A47"/>
+    </svg>
+    must media · <span>roteiros</span>
+  </div>
+  <div class="badge">⚡ ia powered</div>
+</header>
+
+<main class="container">
+  <div class="hero">
+    <div class="eyebrow">gerador automático</div>
+    <h1>seu roteiro completo<br>em <em>segundos</em></h1>
+    <p>preencha as informações do vídeo e a ia gera um roteiro pronto pra gravar — com falas exatas, timestamps e dicas de câmera.</p>
+  </div>
+
+  <div class="card" id="formCard">
+
+    <div class="sec">
+      <div class="slabel">conteúdo do vídeo <span class="br">obrigatório</span></div>
+      <div class="grid">
+        <div class="field">
+          <label>tema / pauta <span class="req">*</span></label>
+          <input type="text" id="tema" placeholder="ex: como fazer sobrancelha perfeita em casa">
+        </div>
+        <div class="field">
+          <label>pontos principais <span class="req">*</span><span class="hint">1 por linha — o mais importante</span></label>
+          <div class="kp">
+            <textarea id="pontos" class="big" placeholder="ex:&#10;explique o que é design de sobrancelha&#10;mostre os materiais necessários&#10;demonstre o passo a passo&#10;dê dica de como fixar o resultado"></textarea>
+            <div class="kpc" id="kpc">0 pontos</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="sec">
+      <div class="slabel">tipo de conteúdo <span class="br">obrigatório</span></div>
+      <div class="tipo-grid">
+        <label class="tc sel" id="tc-conexao" onclick="selT('conexao')">
+          <input type="radio" name="tipo" value="conexao" checked>
+          <div class="tck"></div>
+          <div class="te">🤝</div>
+          <div class="tn">conexão</div>
+          <div class="tdesc">engaja e aproxima — cria identificação e vínculo com o público</div>
+        </label>
+        <label class="tc" id="tc-ensino" onclick="selT('ensino')">
+          <input type="radio" name="tipo" value="ensino">
+          <div class="tck"></div>
+          <div class="te">🎓</div>
+          <div class="tn">ensino</div>
+          <div class="tdesc">gera valor real — educa e entrega conhecimento prático</div>
+        </label>
+        <label class="tc" id="tc-consciencia" onclick="selT('consciencia')">
+          <input type="radio" name="tipo" value="consciencia">
+          <div class="tck"></div>
+          <div class="te">💡</div>
+          <div class="tn">consciência</div>
+          <div class="tdesc">faz perceber o problema — desperta e gera urgência</div>
+        </label>
+        <label class="tc" id="tc-autoridade" onclick="selT('autoridade')">
+          <input type="radio" name="tipo" value="autoridade">
+          <div class="tck"></div>
+          <div class="te">🏆</div>
+          <div class="tn">autoridade</div>
+          <div class="tdesc">prova que você resolve — posiciona como referência</div>
+        </label>
+      </div>
+    </div>
+
+    <div class="sec">
+      <div class="slabel">formato & estilo <span class="br">obrigatório</span></div>
+      <div class="grid g3">
+        <div class="field">
+          <label>formato <span class="req">*</span></label>
+          <select id="formato">
+            <option value="tutorial">tutorial / passo a passo</option>
+            <option value="demonstracao">demonstração ao vivo</option>
+            <option value="dica">dica rápida</option>
+            <option value="bastidores">bastidores</option>
+            <option value="storytelling">storytelling</option>
+            <option value="lista">lista / ranking</option>
+            <option value="antes-depois">antes e depois</option>
+            <option value="polemico">polêmico / opinião</option>
+            <option value="vlog">vlog</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>duração <span class="req">*</span></label>
+          <select id="duracao">
+            <option value="30s">30 segundos</option>
+            <option value="1min" selected>1 minuto</option>
+            <option value="1min30s">1min30s</option>
+            <option value="2min">2 minutos</option>
+            <option value="3min">3 minutos</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>tom de voz <span class="req">*</span></label>
+          <select id="tom">
+            <option value="amiga">amiga que manja</option>
+            <option value="profissional">profissional mas leve</option>
+            <option value="energetico">energético</option>
+            <option value="calmo">calmo com autoridade</option>
+            <option value="bem-humorado">bem-humorado</option>
+            <option value="inspirador">inspirador</option>
+          </select>
+        </div>
+      </div>
+      <div class="grid g2" style="margin-top:14px">
+        <div class="field">
+          <label>linguagem <span class="req">*</span></label>
+          <select id="linguagem">
+            <option value="informal-direta">informal e direta</option>
+            <option value="informal-leve">informal e leve</option>
+            <option value="semi-formal">semi-formal</option>
+            <option value="formal">formal</option>
+            <option value="coloquial">coloquial</option>
+            <option value="educativa">educativa</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <div class="sec">
+      <div class="slabel">personalização <span class="bo">opcional</span></div>
+      <div class="grid g2">
+        <div class="field">
+          <label>gancho inicial</label>
+          <input type="text" id="gancho" placeholder="ex: 90% das pessoas erra aqui...">
+        </div>
+        <div class="field">
+          <label>cta desejado</label>
+          <input type="text" id="cta" placeholder="ex: salva esse vídeo pra não esquecer">
+        </div>
+        <div class="field">
+          <label>como chama o público</label>
+          <input type="text" id="publico" placeholder="ex: divas, rainhas, galera">
+        </div>
+        <div class="field">
+          <label>@ do perfil</label>
+          <input type="text" id="arroba" placeholder="ex: @mustmedia">
+        </div>
+      </div>
+      <div class="field" style="margin-top:14px">
+        <label>contexto extra <span class="hint">informações adicionais que o roteiro deve considerar</span></label>
+        <textarea id="contexto" placeholder="ex: vídeo para stories, público entre 25-40 anos, mães que trabalham em casa"></textarea>
+      </div>
+    </div>
+
+    <div class="genwrap">
+      <button class="btn-gen" id="btnG" onclick="gerar()">
+        <span>✦</span> gerar roteiro completo
+      </button>
+      <div class="errbox" id="err"></div>
+    </div>
+
+    <div class="loadwrap" id="lw">
+      <div class="spin"></div>
+      <p class="ltxt">a ia está criando seu roteiro...</p>
+      <div class="lsteps">
+        <div class="lstep on" id="ls1">🧠 analisando seus pontos principais</div>
+        <div class="lstep" id="ls2">✍️ escrevendo as falas do roteiro</div>
+        <div class="lstep" id="ls3">⏱️ ajustando timestamps e ritmo</div>
+        <div class="lstep" id="ls4">✨ finalizando copy e legenda</div>
+      </div>
+    </div>
+
+    <div class="resultwrap" id="rw">
+      <div class="rhead">
+        <div class="rtitle">roteiro gerado com sucesso</div>
+        <div class="racts">
+          <button class="ba" onclick="novo()">↺ novo roteiro</button>
+          <button class="ba p" id="btnCp" onclick="copiar()">⎘ copiar tudo</button>
+        </div>
+      </div>
+      <div class="rbody">
+        <div class="sout" id="so"></div>
+        <div class="regenstrip">
+          <button class="bregen" id="bh" onclick="variacao('hook')">🎯 3 hooks diferentes</button>
+          <button class="bregen" id="bl" onclick="variacao('legenda')">📝 legenda alternativa</button>
+          <button class="bregen" id="bc" onclick="variacao('cta')">💬 5 ctas diferentes</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<footer><p>feito com <span>♥</span> por must media · gerador de roteiros com ia</p></footer>
+
+<script>
+const g = id => document.getElementById(id);
+const selV = id => { const e = g(id); return e.options[e.selectedIndex].text; };
+
+g('pontos').addEventListener('input', function() {
+  const n = this.value.split('\n').filter(l => l.trim()).length;
+  g('kpc').textContent = `${n} ${n === 1 ? 'ponto' : 'pontos'}`;
+});
+
+const tipoDesc = {
+  conexao: 'conexão (engaja e aproxima) — crie identificação, cumplicidade e vínculo emocional. use histórias pessoais, situações do dia a dia, vulnerabilidade estratégica. o objetivo é fazer a pessoa se sentir vista e entendida.',
+  ensino: 'ensino (gera valor real) — entregue conhecimento prático, concreto e aplicável. ensine algo que a pessoa pode usar hoje. seja claro, estruturado e didático.',
+  consciencia: 'consciência (faz perceber o problema) — desperte, incomode e crie urgência. mostre um problema que a pessoa tem mas ainda não percebeu. use dados, perguntas provocativas, comparações.',
+  autoridade: 'autoridade (prova que você resolve) — posicione como referência. use cases reais, resultados concretos, provas sociais, metodologia própria. gere confiança.',
+};
+
+function selT(v) {
+  ['conexao','ensino','consciencia','autoridade'].forEach(t => g(`tc-${t}`).classList.remove('sel'));
+  g(`tc-${v}`).classList.add('sel');
+  document.querySelector(`input[value="${v}"]`).checked = true;
+}
+
+function getData() {
+  const tipo = document.querySelector('input[name="tipo"]:checked')?.value || 'conexao';
+  return {
+    tema: g('tema').value.trim(),
+    pontos: g('pontos').value.trim(),
+    tipo, tipoDesc: tipoDesc[tipo],
+    formato: selV('formato'), duracao: selV('duracao'),
+    tom: selV('tom'), linguagem: selV('linguagem'),
+    gancho: g('gancho').value.trim(),
+    cta: g('cta').value.trim(),
+    publico: g('publico').value.trim(),
+    arroba: g('arroba').value.trim(),
+    contexto: g('contexto').value.trim(),
+  };
+}
+
+function buildPrompt(d) {
+  const pts = d.pontos.split('\n').filter(l => l.trim()).map((p, i) => `${i+1}. ${p.trim()}`).join('\n');
+  return `você é um especialista em criação de roteiros para vídeos de redes sociais. crie um roteiro COMPLETO e PRONTO PARA GRAVAR.
+
+INFORMAÇÕES DO VÍDEO:
+- tema: ${d.tema}
+- tipo de conteúdo: ${d.tipoDesc}
+- formato: ${d.formato}
+- duração: ${d.duracao}
+- tom de voz: ${d.tom}
+- linguagem: ${d.linguagem}
+${d.publico ? `- como chama o público: ${d.publico}` : ''}
+${d.arroba ? `- @ do perfil: ${d.arroba}` : ''}
+${d.contexto ? `- contexto extra: ${d.contexto}` : ''}
+
+PONTOS PRINCIPAIS (CADA UM VIRA UMA SEÇÃO DO ROTEIRO COM FALA DESENVOLVIDA):
+${pts}
+${d.gancho ? `\nGANCHO INICIAL SUGERIDO: ${d.gancho}` : ''}
+${d.cta ? `CTA DESEJADO: ${d.cta}` : ''}
+
+REGRAS OBRIGATÓRIAS:
+1. falas EXATAS prontas para gravar — nunca use colchetes como [sua fala aqui]
+2. cada ponto principal vira uma seção real com fala específica e desenvolvida
+3. adapte ao formato "${d.formato}": tutorial = passos numerados, storytelling = narrativa, dica = direto ao ponto, polêmico = começa com provocação
+4. timestamps distribuídos dentro de ${d.duracao}
+5. todo o texto em lowercase
+6. legenda com emojis e hashtags relevantes
+
+ESTRUTURA OBRIGATÓRIA:
+
+═══════════════════════════════════════
+📱 tela inicial (copy da thumbnail/capa)
+═══════════════════════════════════════
+[escreva o texto real — máximo 6 palavras impactantes]
+
+═══════════════════════════════════════
+🎯 opções de hook (escolha uma)
+═══════════════════════════════════════
+hook 1 (curiosidade): [fala completa pronta para gravar]
+hook 2 (polêmica/provocação): [fala completa pronta para gravar]
+hook 3 (promessa direta): [fala completa pronta para gravar]
+
+═══════════════════════════════════════
+🎬 roteiro completo com timestamps
+═══════════════════════════════════════
+[seções com timestamp, fala exata e direção de câmera]
+
+═══════════════════════════════════════
+📝 legenda sugerida
+═══════════════════════════════════════
+[legenda completa com emojis e hashtags]
+
+═══════════════════════════════════════
+💡 dicas de gravação
+═══════════════════════════════════════
+[4 a 6 dicas específicas para esse vídeo]`;
+}
+
+// chama /api/gerar (seu servidor na Vercel) — não mais direto pra Anthropic
+async function api(prompt, max_tokens = 4096) {
+  const r = await fetch('/api/gerar', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ prompt, max_tokens }),
+  });
+  const j = await r.json();
+  if (!r.ok) throw new Error(j.error || `erro ${r.status}`);
+  return j.text;
+}
+
+let lint, lstep = 0;
+function startLoad() {
+  const ss = ['ls1','ls2','ls3','ls4'];
+  ss.forEach(s => g(s).className = 'lstep');
+  g('ls1').className = 'lstep on'; lstep = 1;
+  lint = setInterval(() => {
+    if (lstep < ss.length) {
+      if (lstep > 0) g(ss[lstep-1]).className = 'lstep done';
+      g(ss[lstep]).className = 'lstep on'; lstep++;
+    }
+  }, 2200);
+}
+function stopLoad() {
+  clearInterval(lint);
+  ['ls1','ls2','ls3','ls4'].forEach(s => g(s).className = 'lstep done');
+}
+
+async function gerar() {
+  const d = getData();
+  g('err').className = 'errbox';
+  if (!d.tema) { showErr('preencha o tema / pauta do vídeo.'); return; }
+  if (!d.pontos) { showErr('preencha os pontos principais — eles são o coração do roteiro!'); return; }
+  const btn = g('btnG');
+  btn.disabled = true; btn.innerHTML = '<span>⏳</span> gerando...';
+  g('lw').classList.add('on'); g('rw').className = 'resultwrap';
+  startLoad();
+  try {
+    const txt = await api(buildPrompt(d));
+    stopLoad(); await new Promise(r => setTimeout(r, 450));
+    g('lw').classList.remove('on');
+    g('so').textContent = txt;
+    g('rw').className = 'resultwrap on';
+    g('rw').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  } catch(e) {
+    stopLoad(); g('lw').classList.remove('on');
+    showErr(`erro ao gerar: ${e.message}`);
+  } finally {
+    btn.disabled = false; btn.innerHTML = '<span>✦</span> gerar roteiro completo';
+  }
+}
+
+async function variacao(tipo) {
+  const d = getData();
+  const out = g('so'); const orig = out.textContent;
+  ['bh','bl','bc'].forEach(b => g(b).disabled = true);
+  const labels = { hook: 'hooks alternativos', legenda: 'legenda alternativa', cta: 'ctas alternativos' };
+  const prompts = {
+    hook: `com base no tema "${d.tema}" e tipo "${d.tipo}", crie 3 hooks alternativos com ângulos DIFERENTES:\nhook 1 — curiosidade intensa\nhook 2 — polêmica ou provocação\nhook 3 — identificação emocional\nfalas completas prontas para gravar, em lowercase.`,
+    legenda: `crie uma legenda alternativa para vídeo sobre "${d.tema}" (formato: ${d.formato}, tipo: ${d.tipo}). ângulo diferente, com emojis estratégicos e hashtags. em lowercase.`,
+    cta: `crie 5 ctas criativos para final de vídeo sobre "${d.tema}". cada um com objetivo diferente: salvar, comentar, seguir, compartilhar, clicar no link. falas naturais e completas, em lowercase. tom: ${d.tom}.`
+  };
+  try {
+    out.textContent = `⏳ gerando ${labels[tipo]}...\n\n` + orig;
+    const txt = await api(prompts[tipo], 1500);
+    const sep = `\n\n${'─'.repeat(46)}\n✨ ${labels[tipo]}\n${'─'.repeat(46)}\n\n`;
+    out.textContent = orig + sep + txt;
+    out.scrollTop = out.scrollHeight;
+  } catch(e) {
+    out.textContent = orig; showErr(`erro: ${e.message}`);
+  } finally {
+    ['bh','bl','bc'].forEach(b => g(b).disabled = false);
+  }
+}
+
+async function copiar() {
+  const txt = g('so').textContent; const btn = g('btnCp');
+  try { await navigator.clipboard.writeText(txt); }
+  catch { const ta = document.createElement('textarea'); ta.value = txt; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta); }
+  btn.textContent = '✓ copiado!'; btn.className = 'ba cp';
+  setTimeout(() => { btn.textContent = '⎘ copiar tudo'; btn.className = 'ba p'; }, 2500);
+}
+
+function novo() { g('rw').className = 'resultwrap'; g('formCard').scrollIntoView({ behavior: 'smooth' }); }
+function showErr(m) { const b = g('err'); b.textContent = '⚠️ ' + m; b.className = 'errbox on'; b.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); }
+document.querySelectorAll('input[type=text]').forEach(i => i.addEventListener('keydown', e => { if (e.key === 'Enter') gerar(); }));
+</script>
+</body>
+</html>
